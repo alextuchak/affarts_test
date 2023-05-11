@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Flower, Lot, Order
+from .models import Flower, Lot, Order, LotReview, SellerReview
 from users.serializers import UserForLotSerializers
 
 
@@ -40,3 +40,33 @@ class OrderShowSerializers(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = ('id', 'buyer', 'lot', 'created_at')
+
+
+class LotReviewCreateSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = LotReview
+        fields = ('author', 'lot', 'text', 'rating')
+
+
+class LotReviewForShowSerializers(serializers.ModelSerializer):
+    author = UserForLotSerializers()
+    lot = LotSerializers()
+
+    class Meta:
+        model = LotReview
+        fields = ('author', 'lot', 'text', 'rating')
+
+
+class SellerReviewCreateSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = SellerReview
+        fields = ('author', 'seller', 'text', 'rating')
+
+
+class SellerReviewForShowSerializers(serializers.ModelSerializer):
+    author = UserForLotSerializers()
+    seller =  UserForLotSerializers()
+
+    class Meta:
+        model = SellerReview
+        fields = ('author', 'seller', 'text', 'rating')

@@ -1,8 +1,10 @@
 from rest_framework.views import APIView
 from users.models import User
 from django.http import JsonResponse
-from .serializers import FlowerSerializers, LotCreateSerializers, OrderCreateSerializers, OrderShowSerializers
-from .models import Lot, Order
+from .serializers import FlowerSerializers, LotCreateSerializers, OrderCreateSerializers, OrderShowSerializers, \
+    LotReviewCreateSerializers, LotReviewForShowSerializers, SellerReviewCreateSerializers, \
+    SellerReviewForShowSerializers
+from .models import Lot, Order, LotReview, SellerReview
 
 
 class FlowerCreateView(APIView):
@@ -30,6 +32,7 @@ class LotView(APIView):
         user = User.objects.filter(id=request.data["seller"]).first()
         if user.type != 'seller':
             return {'status': False, 'message': 'only for sellers!'}
+        return {"status": True}
 
     def post(self, request):
         data_check = self.check_data(request)
@@ -74,6 +77,60 @@ class OrderView(APIView):
         order_serializers = OrderCreateSerializers(data=request.data)
         if order_serializers.is_valid():
             order_serializers.save()
+            return JsonResponse({'Status': True}, status=201)
+        else:
+            return JsonResponse({'Status': False}, status=403)
+
+
+class LotReviewView(APIView):
+
+    def check_data(self, request):
+        if not 'author' in request.data:
+            return {'status': False, 'message': 'user id is required!'}
+        user = User.objects.filter(id=request.data["author"]).first()
+        if user.type != 'buyer':
+            return {'status': False, 'message': 'only for buyers!'}
+        return {"status": True}
+
+    def get(self, request):
+        serializer = LotReviewForShowSerializers(LotReview.objects.filter(author=request.query_params["id"]), many=True,
+                                                 )
+        return JsonResponse(serializer.data, safe=False)
+
+    def post(self, request):
+        data_check = self.check_data(request)
+        if not data_check['status']:
+            return JsonResponse({'status': False, 'message': data_check['message']}, status=403)
+        review_serializer = LotReviewCreateSerializers(data=request.data)
+        if review_serializer.is_valid():
+            review_serializer.save()
+            return JsonResponse({'Status': True}, status=201)
+        else:
+            return JsonResponse({'Status': False}, status=403)
+
+
+class SellerReviewView(APIView):
+    def check_data(self, request):
+        if not 'author' in request.data:
+            return {'status': False, 'message': 'user id is required!'}
+        user = User.objects.filter(id=request.data["author"]).first()
+        if user.type != 'buyer':
+            return {'status': False, 'message': 'only for buyers!'}
+        return {"status": True}
+
+    def get(self, request):
+        serializer = SellerReviewForShowSerializers(SellerReview.objects.filter(author=request.query_params["id"]),
+                                                    many=True,
+                                                    )
+        return JsonResponse(serializer.data, safe=False)
+
+    def post(self, request):
+        data_check = self.check_data(request)
+        if not data_check['status']:
+            return JsonResponse({'status': False, 'message': data_check['message']}, status=403)
+        review_serializer = SellerReviewCreateSerializers(data=request.data)
+        if review_serializer.is_valid():
+            review_serializer.save()
             return JsonResponse({'Status': True}, status=201)
         else:
             return JsonResponse({'Status': False}, status=403)
