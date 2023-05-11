@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Flower, Lot, Order, LotReview, SellerReview
 from users.serializers import UserForLotSerializers
+from users.models import User
 
 
 class FlowerSerializers(serializers.ModelSerializer):
@@ -65,8 +66,20 @@ class SellerReviewCreateSerializers(serializers.ModelSerializer):
 
 class SellerReviewForShowSerializers(serializers.ModelSerializer):
     author = UserForLotSerializers()
-    seller =  UserForLotSerializers()
+    seller = UserForLotSerializers()
 
     class Meta:
         model = SellerReview
         fields = ('author', 'seller', 'text', 'rating')
+
+
+class TotalLotSerializers(serializers.ModelSerializer):
+
+    seller = UserForLotSerializers()
+    total_sum = serializers.IntegerField(required=False)
+    buyers = UserForLotSerializers(many=True)
+
+    class Meta:
+        model = Lot
+        fields = ('seller', 'total_sum', 'buyers')
+        read_only_fields = ('id',)

@@ -24,7 +24,7 @@ class Flower(models.Model):
 
 
 class Lot(models.Model):
-    seller = models.ForeignKey(to=User, on_delete=models.CASCADE)
+    seller = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name='lot')
     flower = models.ForeignKey(to=Flower, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=0)
     price = models.PositiveIntegerField(default=0)
@@ -32,8 +32,8 @@ class Lot(models.Model):
 
 
 class Order(models.Model):
-    buyer = models.ForeignKey(to=User, on_delete=models.CASCADE)
-    lot = models.ForeignKey(to=Lot, on_delete=models.CASCADE)
+    buyer = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name='buyer')
+    lot = models.ForeignKey(to=Lot, on_delete=models.CASCADE, related_name='order')
     created_at = models.DateTimeField(auto_now_add=True)
 
 

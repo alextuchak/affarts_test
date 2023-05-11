@@ -1,11 +1,12 @@
 from django.urls import path
-from .views import FlowerCreateView, LotView, OrderView, LotReviewView, SellerReviewView
+from .views import FlowerCreateView, LotView, OrderView, LotReviewView, SellerReviewView, LotTotalView
 
 app_name = 'flowers'
 
 urlpatterns = [
     path('add/', FlowerCreateView.as_view(), name='flowers'),
     path('lot/', LotView.as_view(), name='lot'),
+    path('lot/total/', LotTotalView.as_view(), name='total'),
     path('order/create/', OrderView.as_view(), name='order_create'),
     path('order/get/', OrderView.as_view(), name='order_get'),
     path('review/lot/post/', LotReviewView.as_view(), name='lot_review_post'),

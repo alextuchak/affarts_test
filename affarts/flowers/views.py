@@ -3,8 +3,10 @@ from users.models import User
 from django.http import JsonResponse
 from .serializers import FlowerSerializers, LotCreateSerializers, OrderCreateSerializers, OrderShowSerializers, \
     LotReviewCreateSerializers, LotReviewForShowSerializers, SellerReviewCreateSerializers, \
-    SellerReviewForShowSerializers
+    SellerReviewForShowSerializers, TotalLotSerializers
 from .models import Lot, Order, LotReview, SellerReview
+from django.db.models import Sum, F
+import copy
 
 
 class FlowerCreateView(APIView):
@@ -134,3 +136,21 @@ class SellerReviewView(APIView):
             return JsonResponse({'Status': True}, status=201)
         else:
             return JsonResponse({'Status': False}, status=403)
+
+
+class LotTotalView(APIView):
+    def get(self, request):
+        queryset = Lot.objects.prefetch_related('order').annotate(
+            total_sum=Sum(F('order__lot_id__price') * F('order__lot_id__quantity'))).all()
+        orders = Order.objects.all()
+        data = []
+        for item in queryset:
+            temp_dict = {'seller': item.seller, 'total_sum': item.total_sum}
+            temp_buyers = []
+            for order in orders:
+                if order.lot_id == item.id:
+                    temp_buyers.append(order.buyer)
+            temp_dict['buyers'] = copy.deepcopy(temp_buyers)
+            data.append(temp_dict)
+        serializers = TotalLotSerializers(data, many=True)
+        return JsonResponse(serializers.data, safe=False)
