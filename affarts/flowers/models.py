@@ -1,4 +1,5 @@
 from django.db import models
+from users.models import User
 
 COLOR_CHOICES = (
     ('Red', 'Красный'),
@@ -15,8 +16,11 @@ class Flower(models.Model):
 
 
 class Lot(models.Model):
+    seller = models.ForeignKey(to=User, on_delete=models.CASCADE)
     flower = models.ForeignKey(to=Flower, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=0)
     price = models.PositiveIntegerField(default=0)
     visibility = models.BooleanField(default=True)
+
+
 
