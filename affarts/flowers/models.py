@@ -23,4 +23,7 @@ class Lot(models.Model):
     visibility = models.BooleanField(default=True)
 
 
-
+class Order(models.Model):
+    buyer = models.ForeignKey(to=User, on_delete=models.CASCADE)
+    lot = models.ForeignKey(to=Lot, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
